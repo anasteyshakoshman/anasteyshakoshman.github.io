@@ -1,150 +1,127 @@
+<!-- Алгоритм Брезенхэма -->
 <HTML>
-<HEAD>
-<STYLE>
-	body {
-		margin: 0;
-	}
-	#lab03 {
-		border-width: 3px;
-		border-color: #000000;
-		border-style: solid; 
-	}
-	.buttons {
-		margin: 30px 0px 0px 500px;
-	}
-</STYLE>
-</HEAD>
-<BODY>
-	<div class= "canvas">
-		<canvas id='lab03' height='500' width='1000' style='border-width: 3px' />
-	</div>
-	<div class = "buttons">
-		<button type="button" id="firstButton" onclick="lineFunction()">Line</button>  
-		<button type="button" id="secondButton" onclick="circleFunction()">Circle</button>  
-	</div>
+<BODY style="margin:0;">
+<canvas id="hw3" width="600px" height="600px" style = "border:4px solid black; position:absolute;
+left:auto; top:auto; z-index: 2">
+</canvas>
 <script>
-	var canvas = document.getElementById('lab03');
-	var ctx = canvas.getContext('2d');
-	var buffer=[];
-	
-	function getMousePos(canvas) {
-		return {
-			x: event.clientX - 3,
-			y: event.clientY - 3
-		};
-	}
-	var plot = function(x, y) { 
-		if(isFinite(x) && isFinite(y)){
-			setPixel(x,y, plot.color);
+  var canvas=document.getElementById('hw3');
+  var ctx = canvas.getContext('2d');
+  ctx.lineWidth = 2; // толщина линии
+
+  alert("Tab to mouse!");
+  function drawpixel(x, y)
+  {
+    ctx.fillRect(x, y, 1, 1);
+  }
+
+  function line(x1, y1, x2, y2)
+  {
+    var deltaX = Math.abs(x2 - x1);
+    var deltaY = Math.abs(y2 - y1);
+    var signX = x2 - x1;
+    if(signX > 0) signX = 1;
+    if(signX < 0) signX = -1;
+    var signY = y2 - y1;
+    if(signY > 0) signY = 1;
+    if(signY < 0) signY = -1;
+    var error = deltaX - deltaY;
+    drawpixel(x2, y2);
+    while(x1 != x2 || y1 != y2)
+   {
+        drawpixel(x1, y1);
+        var error2 = error * 2;
+        if(error2 > -deltaY)
+        {
+            error -= deltaY;
+            x1 += signX;
+        }
+        if(error2 < deltaX)
+        {
+            error += deltaX;
+            y1 += signY;
+        }
+    }
+}
+
+ function circle(x0, y0, radius)
+ {
+	var x = 0;
+	var y = radius;
+	var delta = 1 - 2 * radius;
+	var error = 0;
+	while(y >= 0)
+  {
+		drawpixel(x0 + x, y0 + y);
+		drawpixel(x0 + x, y0 - y);
+		drawpixel(x0 - x, y0 + y);
+		drawpixel(x0 - x, y0 - y);
+		error = 2 * (delta + y) - 1;
+		if(delta < 0 && error <= 0)
+    {
+			++x;
+			delta += 2 * x + 1;
+			continue;
 		}
-	};
- 
-	function setPixel (x,y,c) { 
-		var p = ctx.createImageData(1,1);
-		p.data[0]=c.r;
-		p.data[1]=c.g;
-		p.data[2]=c.b;
-		p.data[3]=c.a;
-		var data = ctx.getImageData(x, y, 1,1).data;
-		if(data[3] <= p.data[3]) 
-			ctx.putImageData(p,x,y);
-	}
- 
-	function drawLine(x1, y1, x2, y2) {
-	
-		plot.color = {r:0,g:0,b:0,a:255}; 
-		var deltaX = Math.abs(x2 - x1);
-		var deltaY = Math.abs(y2 - y1);
-		var signX = x1 < x2 ? 1 : -1;
-		var signY = y1 < y2 ? 1 : -1;
-		var error = deltaX - deltaY;
-		
-		plot(x2, y2);
-		while(x1 != x2 || y1 != y2) 
-		{
-			plot(x1, y1);
-			var error2 = error * 2;
-			if(error2 > -deltaY) 
-			{
-				error -= deltaY;
-				x1 += signX;
-			}
-			if(error2 < deltaX) 
-			{
-				error += deltaX;
-				y1 += signY;
-			}
+		error = 2 * (delta - x) - 1;
+		if(delta > 0 && error > 0)
+    {
+			--y;
+			delta += 1 - 2 * y;
+			continue;
 		}
+		++x;
+		delta += 2 * (x - y);
+		--y;
 	}
-	
-	function drawCircle(x1, y1, x2, y2) {
-    
-		plot.color = {r:0,g:0,b:0,a:255}; 
-		var deltaX = Math.abs(x2 - x1);
-		var deltaY = Math.abs(y2 - y1);
-		var radius = Math.round(Math.sqrt(deltaX * deltaX + deltaY * deltaY));
-		var signX = 0;
-		var signY = radius;
-		var gap = 0;
-		delta = (2 - 2 * radius);
-		while(signY >= 0) {
-			plot(x1 + signX, y1 + signY);
-			plot(x1 + signX, y1 - signY);
-			plot(x1 - signX, y1 - signY);
-			plot(x1 - signX, y1 + signY);
-			gap = 2 * (delta + signY) - 1;
-                if (delta < 0 && gap <= 0)
-                {
-                    signX++;
-                    delta += 2 * signX + 1;
-                    continue;
-                }
-                if (delta > 0 && gap > 0)
-                {
-                    signY--;
-                    delta -= 2 * signY + 1;
-                    continue;
-                }
-                signX++;
-                delta += 2 * (signX - signY);
-                signY--;
-		}
-		
-	}
-	
-	var lineListener = function(event) {
-		var mousePos = getMousePos(canvas);
-		buffer.push(mousePos.x);
-		buffer.push(mousePos.y);
-		if(buffer.length == 4) {
-			drawLine(buffer[0], buffer[1], buffer[2], buffer[3]);
-			do {
-				buffer.pop();
-			} while(buffer.length > 0)
-		}
-	}
-		
-	var circleListener = function(event) {
-		var mousePos = getMousePos(canvas);
-		buffer.push(mousePos.x);
-		buffer.push(mousePos.y);
-		if(buffer.length == 4) {
-			drawCircle(buffer[0], buffer[1], buffer[2], buffer[3]);
-			do {
-				buffer.pop();
-			} while(buffer.length > 0)
-		}
-	}
-	
-	function lineFunction() {
-		canvas.removeEventListener('click', circleListener, false);
-		canvas.addEventListener('click', lineListener, false);
-	}
-	
-	function circleFunction() {
-		canvas.removeEventListener('click', lineListener, false);
-		canvas.addEventListener('click', circleListener, false);
-	}
-</script> 
-</BODY> 
+}
+
+ canvas.addEventListener('mousedown', onclick, false);
+
+ var check = false;
+ var draw_line = false;
+ var X1 = 0;
+ var Y1 = 0;
+ var X2 = 0;
+ var Y2 = 0;
+
+ canvas.onclick = function(event)
+ {
+   if(check == false)
+   {
+     X1 = event.offsetX;
+     Y1 = event.offsetY;
+     check = true;
+   }
+   else
+   {
+     X2 = event.offsetX;
+     Y2 = event.offsetY;
+     check = false;
+   }
+ }
+
+  function work()
+  {
+    if ( X1 != 0 && Y1 != 0 && X2 != 0 && Y2 != 0)
+    {
+      if(draw_line == false)
+      {
+        line(X1, Y1, X2, Y2);
+        draw_line = true;
+      }
+      else
+      {
+        circle(X1, Y1, Math.sqrt( Math.pow((X1 - X1), 2) + Math.pow((Y1 - Y2), 2)    )   );
+        draw_line = false;
+      }
+      X1 = 0;
+      Y1 = 0;
+      X2 = 0;
+      Y2 = 0;
+    }
+  }
+  setInterval(work , 100);
+</script>
+</BODY>
 </HTML>
