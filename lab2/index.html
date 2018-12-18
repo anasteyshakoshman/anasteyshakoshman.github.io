@@ -1,0 +1,47 @@
+<!-- Медианный фильтр -->
+<HTML>
+<BODY>
+<canvas id ='lab02' height='96' width='96'>
+</canvas>
+<script>
+		var canvas = document.getElementById("lab02");
+		var ctx = canvas.getContext("2d");
+		var width = canvas.width;
+		var height = canvas.height;
+
+		for(let i = 0; i < width; i+=16)
+		{
+			for(let j = 0; j < height; j+=16)
+			{
+				var red = Math.floor(Math.random() * 255);
+				var green = Math.floor(Math.random() * 255);
+				var blue = Math.floor(Math.random() * 255);
+				ctx.fillStyle = "rgb(" + red + "," + green + ", " + blue + ")";
+				ctx.fillRect(i, j, 16, 16);
+			}
+		}
+
+		var iData = ctx.getImageData(0, 0, width, height);
+		for(let i = 1; i < width - 1; i++)
+		{
+			for(let j = 1; j < height - 1; j++)
+			{
+				for(let color = 0; color < 4; color++)
+				{
+					a11 = iData.data[4 * width * (j - 1) + 4 * (i - 1) + color];
+					a12 = iData.data[4 * width * (j - 1) + 4 * i + color];
+					a13 = iData.data[4 * width * (j - 1) + 4 * (i + 1)+ color];
+					a21 = iData.data[4 * width * j + 4 * (i - 1) + color];
+					a22 = iData.data[4 * width * j + 4 * i + color];
+					a23 = iData.data[4 * width * j + 4 * (i + 1) + color];
+					a31 = iData.data[4 * width * (j + 1) + 4 * (i - 1) + color];
+					a32 = iData.data[4 * width * (j + 1) + 4 * i + color];
+					a33 = iData.data[4 * width * (j + 1) + 4 * (i + 1) + color];
+					iData.data[4 * width * j + 4 * i + color] = (a11 + a12 + a13 + a21 + a22 + a23 + a31 + a32 + a33) / 9;
+				}
+			}
+		}
+		ctx.putImageData(iData, 0, 0);
+</script>
+</BODY>
+</HTML>
