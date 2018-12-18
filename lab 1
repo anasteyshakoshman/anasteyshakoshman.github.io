@@ -1,0 +1,58 @@
+<!-- Движение объекта -->
+<HTML>
+<BODY>
+
+<canvas id = "canvasCircle" width = "600" height ="600" style = "border:4px solid violet; position:absolute;
+left:auto; top:auto; z-index: 2">
+</canvas>
+
+<canvas id = "canvasBackground" width = "600" height ="600" style = "border:4px solid violet; position:absolute">
+</canvas>
+
+<script>
+    var backGroundCanvas = document.getElementById("canvasBackground");
+    var backGroundContext = backGroundCanvas.getContext("2d");
+
+    var circleCanvas = document.getElementById("canvasCircle");
+    var circleContext = circleCanvas.getContext("2d");
+
+    var x = 50;
+    var y = 50;
+    var radius = 40;
+    var end = circleCanvas.width - 50;
+    var diff = 10;
+    var startAngle = (Math.PI / 180) * 0;
+    var interval = 90;
+    var endAngle = (Math.PI / 180) * 360;
+
+    backGroundContext.fillStyle = "white";
+    backGroundContext.fillRect(0, 0, backGroundCanvas.width, backGroundCanvas.height);
+
+    var intervalID = setInterval(draw, interval);
+
+    function draw()
+    {
+        circleContext.clearRect(0, 0, circleCanvas.width, circleCanvas.height);
+
+        circleContext.strokeStyle = "violet";
+        circleContext.lineWidth = 20;
+        circleContext.shadowOffsetX = 3;
+        circleContext.shadowOffsetY = 3;
+        circleContext.shadowBlur = 3;
+        circleContext.shadowColor = "black";
+
+        if(x == end) diff *= -1;
+
+        x += diff;
+        y += diff;
+
+        if(x == 50) diff *= -1;
+
+        circleContext.beginPath();
+        circleContext.arc(x, y, radius, startAngle, endAngle, true);
+        circleContext.stroke();
+    }
+</script>
+
+</BODY>
+</HTML>
