@@ -1,0 +1,53 @@
+<!-- Фильтр Собелева (выделения границ) -->
+<HTML>
+<BODY>
+<canvas id ='lab02' height='96' width='96'>
+</canvas>
+<script>
+		var canvas = document.getElementById("lab02");
+		var ctx = canvas.getContext("2d");
+		var width = canvas.width;
+		var height = canvas.height;
+
+		for(let i = 0; i < width; i+=16)
+		{
+			for(let j = 0; j < height; j+=16)
+			{
+				var red = Math.floor(Math.random() * 255);
+				var green = Math.floor(Math.random() * 255);
+				var blue = Math.floor(Math.random() * 255);
+				ctx.fillStyle = "rgb(" + red + "," + green + ", " + blue + ")";
+				ctx.fillRect(i, j, 16, 16);
+			}
+		}
+
+		var iData = ctx.getImageData(0, 0, width, height);
+		var iData2 = ctx.getImageData(0, 0, width, height);
+		for(let i = 1; i < width - 1; i++)
+		{
+			for(let j = 1; j < height - 1; j++)
+			{
+				for(let color = 0; color < 3; color++)
+				{
+					var Gx = 0, Gy = 0, G = 0;
+					a11 = iData.data[4 * width * (j - 1) + 4 * (i - 1) + color];
+					a12 = iData.data[4 * width * (j - 1) + 4 * i + color];
+					a13 = iData.data[4 * width * (j - 1) + 4 * (i + 1)+ color];
+					a21 = iData.data[4 * width * j + 4 * (i - 1) + color];
+					a22 = iData.data[4 * width * j + 4 * i + color];
+					a23 = iData.data[4 * width * j + 4 * (i + 1) + color];
+					a31 = iData.data[4 * width * (j + 1) + 4 * (i - 1) + color];
+					a32 = iData.data[4 * width * (j + 1) + 4 * i + color];
+					a33 = iData.data[4 * width * (j + 1) + 4 * (i + 1) + color];
+					Gx = - a11 - 2 *  a12 - a13 + a31 + 2 * a32 + a33;
+					Gy = - a11 + a13 - 2 * a21 + 2 * a23 - a31 + a33;
+					G = Math.sqrt(Gx * Gx + Gy * Gy);
+					if(G > 255) G = 255;
+					iData2.data[4 * width * j + 4 * i + color]= G;
+				}
+				iData2.data[4 * width * j + 4 * i + 3]= 255;
+			}
+		}
+		ctx.putImageData(iData2, 0, 0);
+</script>
+</BODY>
